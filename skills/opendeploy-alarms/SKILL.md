@@ -1,13 +1,7 @@
 ---
 name: opendeploy-alarms
 version: "0.0.20"
-description: Manage OpenDeploy alarm lifecycle from an agent. Use for active alarms, alert history, alarm notes, acknowledging, resolving, suppressing, alarm-backed legacy support engagement, and human-visible dashboard updates. Use opendeploy-oncall for Discord oncall setup, direct support channel handoff when no alarm exists, and per-alarm conversation with OpenDeploy responders.
-allowed-tools:
-  - AskUserQuestion
-  - Read
-  - Bash(npm:*)
-  - Bash(opendeploy:*)
-  - Bash(jq:*)
+description: Manage OpenDeploy alarm lifecycle from an agent, including active alarms, alert history, notes, acknowledgements, resolution, suppression, and dashboard-visible incident updates. Use opendeploy-oncall when the user wants direct OpenDeploy support.
 user-invokable: true
 ---
 

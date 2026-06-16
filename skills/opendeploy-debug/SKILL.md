@@ -1,7 +1,7 @@
 ---
 name: opendeploy-debug
 version: "0.0.20"
-description: Single OpenDeploy debugging entrypoint for failed or unreachable deployments. Use when the user says logs, show logs, build logs, runtime logs, failed deployment, why failed, diagnose deploy, debug deployment, 502, bad gateway, connection refused, dial tcp timeout, CrashLoopBackOff, build failure, runtime crash, port mismatch, wrong port, Docker EXPOSE mismatch, DB not ready, Redis not ready, startup order, readiness, dependency DNS, DATABASE_URL missing, REDIS_URL missing, dependency env missing, or service starts before managed DB/cache is ready.
+description: Diagnose failed or unreachable OpenDeploy deployments. Use for build/runtime logs, 502/503, port or listener issues, missing env, DB/cache startup failures, migration problems, readiness, and deployment health checks. Start read-only and classify the failure before mutations.
 user-invokable: true
 ---
 

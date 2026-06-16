@@ -1,7 +1,7 @@
 ---
 name: opendeploy-setup
 version: "0.0.20"
-description: Install, update, verify, or repair the OpenDeploy CLI and local agent setup. Use when the user says install OpenDeploy, set up OpenDeploy, setup OpenDeploy, update OpenDeploy, upgrade OpenDeploy, check version, latest version, stale CLI, stale plugin, update CLI, update plugin, verify CLI, run doctor, prepare this agent, or fix OpenDeploy installation. This skill does not create projects unless the original user request also asks to deploy.
+description: Verify, install, update, or repair the OpenDeploy CLI and plugin for this agent. Use when the user asks to install, set up, update, check, or fix OpenDeploy before deploying. Ask before global installs or updates; do not create projects unless the user also asks to deploy.
 user-invokable: true
 ---
 

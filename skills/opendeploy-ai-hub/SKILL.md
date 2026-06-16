@@ -1,6 +1,6 @@
 ---
 name: opendeploy-ai-hub
-description: Manage OpenDeploy AI Hub and migrate existing apps onto it. Provision per-project OpenAI-compatible API keys, top up credits, set up auto-recharge, inspect usage by model or by key, AND scan the current project for OpenAI / Anthropic / Gemini / Cohere / Mistral / Groq / xAI / DeepSeek / Together / OpenRouter / LiteLLM / LangChain / Vercel AI SDK call sites so the agent can offer to swap them onto AI Hub. Use when the user says AI Hub, AI Hub key, AI Hub credits, AI Hub balance, AI Hub usage, OPENDEPLOY_AI_API_KEY, MINIONS_AI_API_KEY, LLM key, LLM credits, OpenAI-compatible key, model usage, top up AI credits, recharge AI Hub, auto-recharge, rotate AI Hub key, deactivate AI key, AI Hub model list, AI Hub pricing, "I want one API key that works across providers", "switch my OpenAI calls to AI Hub", "migrate to AI Hub", "use AI Hub instead of OpenAI", "consolidate my LLM keys", "cheaper LLM gateway", or asks to detect LLM usage in the project. Read this before mutating any AI Hub state — credit top-up commits a real charge, key deletion breaks any running app that depends on the key, and code rewrites touch source files. Always show the inventory and get structured approval before rewriting.
+description: Detect or configure OpenDeploy AI Hub for apps that need an OpenAI-compatible AI API. Use when the user asks about AI Hub, model usage, credits, or migrating existing LLM provider env vars to OpenDeploy AI Hub. Show an inventory and get approval before provisioning keys, changing credits, or editing source.
 user-invokable: true
 ---
 
@@ -75,8 +75,7 @@ Do NOT pick this skill for:
 
 - **Setting `OPENDEPLOY_AI_API_KEY` into a service env** — the deploy flow
   auto-injects the AI Hub key when the service env contains the placeholder
-  `{{OPENDEPLOY_AI_API_KEY}}` (or the legacy `{{MINIONS_AI_API_KEY}}`, kept
-  for backwards compatibility) or a known AI SDK env var. Use `opendeploy-env`
+  `{{OPENDEPLOY_AI_API_KEY}}` or a known AI SDK env var. Use `opendeploy-env`
   to add the placeholder, not this skill.
 - **Initial deploy** — the deploy autoplan provisions an AI Hub key per
   project automatically. Only invoke this skill if the user wants to inspect
@@ -235,10 +234,9 @@ without confirmation. They are all read-only.
    - `key`: the actual `Bearer` token. Treat as a secret — print only when
      the user explicitly asks. Do NOT echo it into logs or commit it.
    - `key_propagated: true|false` — whether the new value was written into
-     project secrets that reference `{{OPENDEPLOY_AI_API_KEY}}` (or the
-     legacy `{{MINIONS_AI_API_KEY}}`). If `false`, the
-     deploy flow will pick it up on next deploy; warn the user that running
-     services will fail until then.
+     project secrets that reference `{{OPENDEPLOY_AI_API_KEY}}`. If `false`,
+     the deploy flow will pick it up on next deploy; warn the user that
+     running services will fail until then.
 5. Surface the base URL the user needs to point their SDK at:
    `opendeploy ai-hub base-url --json`. The response is the constant
    `{"base_url":"https://api.opendeploy.dev/v1","protocol":"OpenAI-compatible","auth_header":"Authorization: Bearer <ai-hub-key>"}`.
@@ -355,7 +353,6 @@ parallel:
 
 Skip any hit where the surrounding code makes it clear the caller is
 already pointing at AI Hub (`api.opendeploy.dev`, `OPENDEPLOY_AI_API_KEY`,
-`MINIONS_AI_API_KEY`,
 or a comment marking it as already-migrated).
 
 ### Step 2 — Categorize and present the inventory

@@ -1,7 +1,7 @@
 ---
 name: opendeploy-auth
 version: "0.0.20"
-description: Manage OpenDeploy authentication. Use when the user says login, log in, sign in, auth, auth status, whoami, token, OpenDeploy token, dashboard token, local deploy credential, guest credential, anonymous credential, bind account, account binding link, credential rejected, 401, or asks to inspect credential binding state.
+description: Inspect or repair OpenDeploy auth state for this agent, including login status, local deploy credential, guest binding, and 401 recovery. Use when the user asks about OpenDeploy auth, login, whoami, binding, or credential issues. Never create or replace credentials without approval.
 user-invokable: true
 ---
 

@@ -65,6 +65,19 @@ The first OpenDeploy deploy is free:
 
 The skills install does not deploy anything by itself. Deployment starts only after the user asks the agent to deploy with OpenDeploy.
 
+## Security Model
+
+Installing these skills only installs Markdown instructions for your agent. It
+does not create an OpenDeploy project, upload source code, create credentials,
+write environment variables, or start billing.
+
+The skills use the official global `opendeploy` CLI for OpenDeploy actions.
+They are written to ask before credential creation, real environment-variable
+upload, paid AI Hub credit changes, destructive actions, or live-service
+mutations. First deploy runs on OpenDeploy's free tier and creates no account,
+payment method, or charge. If a concrete quota or add-on gate appears later,
+the agent stops and asks separately.
+
 ## Included Skills
 
 | Skill | Purpose |

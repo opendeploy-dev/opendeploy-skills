@@ -8,9 +8,6 @@ runtime env:
 {{OPENDEPLOY_AI_API_KEY}}
 ```
 
-The legacy placeholder `{{MINIONS_AI_API_KEY}}` is still accepted for
-backwards compatibility but new flows should use the canonical name above.
-
 The public base URL for OpenDeploy AI Hub is:
 
 ```text

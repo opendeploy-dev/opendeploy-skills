@@ -24,16 +24,15 @@ After installation, ask your agent:
 Use OpenDeploy to deploy this project.
 ```
 
-You can also use the short entrypoints when your agent supports slash-style skill invocation:
+When your agent supports slash-style skill invocation, use:
 
 ```text
 /opendeploy
-/deploy
-/od
 ```
 
-OpenDeploy is published as one user-facing skill: `opendeploy`. `/deploy` and
-`/od` are aliases described inside that skill, not separate install choices.
+OpenDeploy is published as one user-facing skill: `opendeploy`. The universal
+Agent Skills installer does not expose slash aliases for a single skill, so
+`/deploy` and `/od` are not installed by this package.
 
 ## Install Everywhere
 

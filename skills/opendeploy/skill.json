@@ -1,7 +1,7 @@
 {
   "name": "opendeploy",
-  "version": "0.0.21",
-  "description": "One-click OpenDeploy autoplan for coding agents through the official versioned npm CLI. The opendeploy skill is the canonical deploy entrypoint; /deploy and /od are aliases. Common prompts include deploy this, host this, ship this, launch this, make it live, preview this, put this online, get a live URL, deploy this monorepo, deploy web plus worker, attach a persistent volume, persist data, mount persistent disk, persist uploads, persist SQLite, persist file-based queues, use OpenDeploy AI Hub for detected provider keys, and engage OpenDeploy support. First deploy is free, creates no OpenDeploy account, requires no payment method, and after explicitly-approved local deploy credential consent returns an unbound success report whose Step 1 is a bind-first project claim link; after binding, the dashboard shows the live URL and deployment details. Per-service persistent volumes are supported (single-attach RWO, node-local) — declared inline on services create for new services (no downtime) or routed via opendeploy-volume for existing services. Alarm investigation can use opendeploy-oncall to post concise updates into the user's private OpenDeploy oncall Discord thread; non-alarm platform support requests can use opendeploy-oncall to return the user's private Discord channel URL.",
+  "version": "0.0.22",
+  "description": "One-click OpenDeploy autoplan for coding agents through the official versioned npm CLI. The opendeploy skill is the canonical deploy entrypoint. Common prompts include deploy this, host this, ship this, launch this, make it live, preview this, put this online, get a live URL, deploy this monorepo, deploy web plus worker, attach a persistent volume, persist data, mount persistent disk, persist uploads, persist SQLite, persist file-based queues, use OpenDeploy AI Hub for detected provider keys, and engage OpenDeploy support. First deploy is free, creates no OpenDeploy account, requires no payment method, and after explicitly-approved local deploy credential consent returns an unbound success report whose Step 1 is a bind-first project claim link; after binding, the dashboard shows the live URL and deployment details. Per-service persistent volumes are supported (single-attach RWO, node-local) — declared inline on services create for new services (no downtime) or routed via opendeploy-volume for existing services. Alarm investigation can use opendeploy-oncall to post concise updates into the user's private OpenDeploy oncall Discord thread; non-alarm platform support requests can use opendeploy-oncall to return the user's private Discord channel URL.",
   "homepage": "https://opendeploy.dev",
   "api_base": "https://dashboard.opendeploy.dev/api",
   "author": {
@@ -250,12 +250,10 @@
     "tagline": "One-click deploy autoplan through the versioned OpenDeploy CLI.",
     "execution_source": "@opendeploydev/cli",
     "canonical_entrypoint": "opendeploy",
-    "aliases": [
-      "deploy",
-      "od"
-    ],
     "single_user_facing_environment": true,
     "universal_user_entrypoint": true,
-    "specialist_skills_visibility": "internal_compatibility_only"
+    "specialist_skills_visibility": "internal_playbook_labels_only",
+    "slash_entrypoint": "/opendeploy",
+    "alias_support": "not_supported_by_universal_agent_skills_installer"
   }
 }

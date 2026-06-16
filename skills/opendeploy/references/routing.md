@@ -2,8 +2,7 @@
 
 The user-facing entrypoint is `/opendeploy ...` for every OpenDeploy task:
 deploy, env, DB/cache, domain, logs, health, restart, rollback, alarms, oncall,
-auth, setup, and updates. `/deploy` and `/od` are short aliases for
-`/opendeploy deploy ...`.
+auth, setup, and updates.
 
 When the user invokes `/opendeploy ...`, stay in the main `opendeploy` skill and
 use this table as an internal handler map. Do not ask the user to re-run a
@@ -14,8 +13,6 @@ below are internal playbook labels.
 | User intent / prompt after `/opendeploy` | Internal handler |
 |---|---|
 | `deploy this`, `host this`, `publish this`, `ship this`, `launch this`, `make it live`, `preview this`, `put this online`, `give me a live URL` | `opendeploy` |
-| `/deploy` | `deploy` alias -> `opendeploy` |
-| `/od` | `od` alias -> `opendeploy` |
 | `install opendeploy`, `set up opendeploy`, `setup opendeploy`, `update opendeploy`, `upgrade opendeploy`, `activate opendeploy`, `check CLI`, `verify CLI`, `run doctor`, `npm install`, `npm latest`, `init project`, `stale CLI`, `stale plugin`, `doctor says update available` | `opendeploy-setup` |
 | `login`, `log in`, `sign in`, `auth`, `auth status`, `whoami`, `token`, `OpenDeploy token`, `local deploy credential`, `guest credential`, `dashboard token`, `bind account`, `account binding link`, `401` | `opendeploy-auth` |
 | `existing project`, `saved IDs`, `project id`, `service id`, `deployment id`, `same service`, `same project`, `resume deploy`, `what project is this`, `redeploy same service` | `opendeploy-context` |
@@ -32,10 +29,11 @@ below are internal playbook labels.
 | `alert rule`, `threshold`, `notify me`, `notification` | `opendeploy-ops` |
 | `CLI lacks route`, `missing CLI command`, `call OpenDeploy API`, `raw API`, `advanced API`, `API escape hatch`, `GET route`, `POST route`, `PUT route`, `PATCH route` | `opendeploy-api` |
 
-## Alias behavior
+## Slash Command Behavior
 
-`deploy` and `od` are only convenience aliases. They must not contain their own
-deployment logic. They route to the canonical `opendeploy` autoplan workflow.
+The universal Agent Skills package exposes one slash skill: `/opendeploy`.
+Natural language such as "deploy this with OpenDeploy" should also route to the
+same skill when the host agent supports semantic skill matching.
 
 ## Internal Playbooks
 

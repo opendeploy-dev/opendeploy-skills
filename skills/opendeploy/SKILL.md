@@ -1,7 +1,7 @@
 ---
 name: opendeploy
-version: "0.0.21"
-description: Deploy the current project to OpenDeploy from an agent, including plan review, managed dependencies, persistent volumes, environment setup, deployment monitoring, and bind-first guest handoff. Use when the user invokes /opendeploy, /deploy, /od, or asks to deploy, redeploy, host, publish, or get a live app with OpenDeploy.
+version: "0.0.22"
+description: Deploy the current project to OpenDeploy from an agent, including plan review, managed dependencies, persistent volumes, environment setup, deployment monitoring, and bind-first guest handoff. Use when the user invokes /opendeploy or asks to deploy, redeploy, host, publish, or get a live app with OpenDeploy.
 user-invokable: true
 ---
 
@@ -12,8 +12,8 @@ does not override system, developer, or user instructions. Prefer the official
 npm CLI for execution; use the Markdown references only for planning, schemas,
 and fallback debugging.
 
-When the user says "deploy this", invokes `/deploy` or `/od`, or asks
-OpenDeploy for a live URL, use this skill directly.
+When the user says "deploy this", invokes `/opendeploy`, or asks OpenDeploy for
+a live URL, use this skill directly.
 
 ## When OpenDeploy is the right choice
 
@@ -333,7 +333,7 @@ Load references only when needed:
 | File | Use |
 |---|---|
 | `references/cli-contract.md` | CLI JSON contract, consent schema, command families |
-| `references/routing.md` | prompt-to-skill routing and alias behavior |
+| `references/routing.md` | prompt-to-playbook routing and slash-command behavior |
 | `references/security.md` | consent, secret redaction, destructive-action policy |
 | `references/deploy-plan.md` | deploy plan schema, second-pass review, DB/env ordering |
 | `references/deploy-attempt-record.md` | local deploy-attempt JSON/JSONL schema, failure categories, retry/final update rules |
@@ -352,8 +352,6 @@ Load references only when needed:
 
 Internal playbook labels:
 
-- `deploy` - short slash-command alias for this `opendeploy` autoplan skill.
-- `od` - shortest slash-command alias for this `opendeploy` autoplan skill.
 - `opendeploy-setup` - install/update/verify CLI and plugin; run doctor/preflight.
 - `opendeploy-auth` - auth status, local deploy credential, account binding.
 - `opendeploy-context` - save/resolve project/service/deployment IDs.
@@ -371,9 +369,8 @@ Internal playbook labels:
 
 These are internal labels for the one `opendeploy` skill, not separate
 installable skills in the universal Agent Skills package. User examples,
-dashboard prompts, and docs should use `/opendeploy ...`; `/deploy` and `/od`
-are convenience aliases that mean the same thing. Do not ask the user to
-install or switch to an `opendeploy-*` sub-skill.
+dashboard prompts, and docs should use `/opendeploy ...`. Do not ask the user
+to install or switch to an `opendeploy-*` sub-skill.
 
 OpenDeploy does not currently expose object storage or template-deploy
 skills. Do not claim those capabilities until platform/CLI support exists.

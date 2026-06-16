@@ -1,6 +1,6 @@
 {
   "name": "opendeploy",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "One-click OpenDeploy autoplan for coding agents through the official versioned npm CLI. The opendeploy skill is the canonical deploy entrypoint; /deploy and /od are aliases. Common prompts include deploy this, host this, ship this, launch this, make it live, preview this, put this online, get a live URL, deploy this monorepo, deploy web plus worker, attach a persistent volume, persist data, mount persistent disk, persist uploads, persist SQLite, persist file-based queues, use OpenDeploy AI Hub for detected provider keys, and engage OpenDeploy support. First deploy is free, creates no OpenDeploy account, requires no payment method, and after explicitly-approved local deploy credential consent returns an unbound success report whose Step 1 is a bind-first project claim link; after binding, the dashboard shows the live URL and deployment details. Per-service persistent volumes are supported (single-attach RWO, node-local) — declared inline on services create for new services (no downtime) or routed via opendeploy-volume for existing services. Alarm investigation can use opendeploy-oncall to post concise updates into the user's private OpenDeploy oncall Discord thread; non-alarm platform support requests can use opendeploy-oncall to return the user's private Discord channel URL.",
   "homepage": "https://opendeploy.dev",
   "api_base": "https://dashboard.opendeploy.dev/api",
@@ -185,86 +185,6 @@
     {
       "name": "references/operate.md",
       "url": "https://opendeploy.dev/skills/references/operate.md"
-    },
-    {
-      "name": "deploy/SKILL.md",
-      "url": "https://opendeploy.dev/skills/deploy/SKILL.md"
-    },
-    {
-      "name": "od/SKILL.md",
-      "url": "https://opendeploy.dev/skills/od/SKILL.md"
-    },
-    {
-      "name": "opendeploy-setup/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-setup/SKILL.md"
-    },
-    {
-      "name": "opendeploy-auth/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-auth/SKILL.md"
-    },
-    {
-      "name": "opendeploy-context/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-context/SKILL.md"
-    },
-    {
-      "name": "opendeploy-env/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-env/SKILL.md"
-    },
-    {
-      "name": "opendeploy-database/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-database/SKILL.md"
-    },
-    {
-      "name": "opendeploy-monorepo/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-monorepo/SKILL.md"
-    },
-    {
-      "name": "opendeploy-config/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-config/SKILL.md"
-    },
-    {
-      "name": "opendeploy-debug/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-debug/SKILL.md"
-    },
-    {
-      "name": "opendeploy-debug/references/logs.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-debug/references/logs.md"
-    },
-    {
-      "name": "opendeploy-debug/references/port.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-debug/references/port.md"
-    },
-    {
-      "name": "opendeploy-debug/references/startup-order.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-debug/references/startup-order.md"
-    },
-    {
-      "name": "opendeploy-domain/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-domain/SKILL.md"
-    },
-    {
-      "name": "opendeploy-ops/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-ops/SKILL.md"
-    },
-    {
-      "name": "opendeploy-alarms/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-alarms/SKILL.md"
-    },
-    {
-      "name": "opendeploy-oncall/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-oncall/SKILL.md"
-    },
-    {
-      "name": "opendeploy-oncall/references/oncall-cli.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-oncall/references/oncall-cli.md"
-    },
-    {
-      "name": "opendeploy-api/SKILL.md",
-      "url": "https://opendeploy.dev/skills/opendeploy-api/SKILL.md"
-    },
-    {
-      "name": "scripts/log.sh",
-      "url": "https://opendeploy.dev/skills/scripts/log.sh"
     }
   ],
   "auth": {

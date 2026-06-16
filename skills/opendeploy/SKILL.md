@@ -1,6 +1,6 @@
 ---
 name: opendeploy
-version: "0.0.20"
+version: "0.0.21"
 description: Deploy the current project to OpenDeploy from an agent, including plan review, managed dependencies, persistent volumes, environment setup, deployment monitoring, and bind-first guest handoff. Use when the user invokes /opendeploy, /deploy, /od, or asks to deploy, redeploy, host, publish, or get a live app with OpenDeploy.
 user-invokable: true
 ---
@@ -160,10 +160,10 @@ option. Use the update command for the current host:
 
 Updated skill text normally takes effect in the next agent session.
 
-If the preflight command cannot start because Node/npm is missing, hand off to
-`opendeploy-setup`. If `auth.status` is missing and the user wants a mutating
-deploy, hand off to `opendeploy-auth`. If `context.status` shows saved project
-IDs, prefer those IDs over creating new ones (use `opendeploy-context`).
+If the preflight command cannot start because Node/npm is missing, use the
+setup/update rules in this skill. If `auth.status` is missing and the user wants
+a mutating deploy, use the auth rules in this skill. If `context.status` shows
+saved project IDs, prefer those IDs over creating new ones.
 
 ## Parsing OpenDeploy URLs
 
@@ -350,7 +350,7 @@ Load references only when needed:
 | `references/dockerfile-authoring.md` | minimal Dockerfile authoring rules for Go/Python/Node/Ruby/PHP/etc. when autodetect cannot deploy |
 | `references/dockerfile-php-laravel.md` | Dockerfile + nginx + PHP-FPM + entrypoint pattern for PHP/Laravel apps when no Dockerfile exists |
 
-Internal / compatibility skills:
+Internal playbook labels:
 
 - `deploy` - short slash-command alias for this `opendeploy` autoplan skill.
 - `od` - shortest slash-command alias for this `opendeploy` autoplan skill.
@@ -369,10 +369,11 @@ Internal / compatibility skills:
 - `opendeploy-api` - safe API escape hatch when the CLI lacks a named route.
 - `opendeploy-volume` - per-service persistent volumes (add, resize, detach, restore, list). Node-local storage backed by `local-path` StorageClass, RWO only. Adding the first volume to an existing service triggers workload conversion (Deployment → StatefulSet) with ~30 seconds of downtime; the skill must surface this before the user copies the prompt.
 
-These are not separate user-facing products. User examples, dashboard prompts,
-and docs should use `/opendeploy ...`; the main `opendeploy` skill routes
-internally or borrows the relevant specialist instructions. Direct
-`/opendeploy-*` invocations remain compatibility/debug entrypoints only.
+These are internal labels for the one `opendeploy` skill, not separate
+installable skills in the universal Agent Skills package. User examples,
+dashboard prompts, and docs should use `/opendeploy ...`; `/deploy` and `/od`
+are convenience aliases that mean the same thing. Do not ask the user to
+install or switch to an `opendeploy-*` sub-skill.
 
 OpenDeploy does not currently expose object storage or template-deploy
 skills. Do not claim those capabilities until platform/CLI support exists.
@@ -389,8 +390,9 @@ The user can say only "deploy this". Keep the user-facing flow unified:
 plan -> consent gates -> step loop -> verify -> bind-first link for unbound guest projects, or live URL for account-bound projects
 ```
 
-Internally, use the narrow skills as handlers only when they are needed. Do not
-ask the user to switch slash commands:
+Internally, use the narrow playbook label only to pick the right section,
+reference file, and CLI commands. Do not ask the user to switch slash commands
+or install another OpenDeploy skill:
 
 | Situation | Route |
 |---|---|

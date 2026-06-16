@@ -85,7 +85,7 @@ report rather than retry.
 
 | Code | Backend signal today | Retryable | Typical next action |
 |---|---|---|---|
-| `auth_missing` | local: no auth file / token | no | hand off to `opendeploy-auth` |
+| `auth_missing` | local: no auth file / token | no | use the auth playbook |
 | `auth_invalid` | HTTP 401 | no | re-auth via `opendeploy-auth`; never silently delete the file |
 | `auth_forbidden` | HTTP 403 (not bind_required) | no | ask user; do not retry |
 | `bind_required` | `{error: "bind_required"}` | no | print the dashboard binding URL; ask user to bind |
@@ -95,14 +95,14 @@ report rather than retry.
 | `subscription_required` | `{error: "subscription_required"}` | no | recommend plan upgrade; if chosen return `https://dashboard.opendeploy.dev/settings` |
 | `rate_limited` | HTTP 429 | yes | back off, then retry once |
 | `gateway_unreachable` | network / DNS error | yes | retry once; if still failing, report and stop |
-| `gateway_degraded` | `status --json` shows downstream breaker `open` | yes after recovery | wait or hand off to `opendeploy-ops` |
+| `gateway_degraded` | `status --json` shows downstream breaker `open` | yes after recovery | wait or use the ops playbook |
 | `not_implemented` | CLI returns `{status: "not_implemented"}` (e.g. `deploy step` for unsupported step) | no | fall back to the resource commands listed in `references/cli.md` |
 | `invalid_input` | HTTP 400 | no | fix the call; do not loop |
 | `not_found` | HTTP 404 | no | re-resolve context |
 | `conflict` | HTTP 409 (e.g. duplicate subdomain) | no | ask user how to proceed |
-| `port_mismatch` | log diagnose result | no | hand off to `opendeploy-debug` |
+| `port_mismatch` | log diagnose result | no | use the debug playbook |
 | `dependency_not_ready` | `dependencies status` non-running | yes after wait | poll via `dependencies wait` |
-| `dependency_env_missing` | missing env in `services env get` | no | hand off to `opendeploy-env` / `opendeploy-debug` |
+| `dependency_env_missing` | missing env in `services env get` | no | use the env or debug playbook |
 | `namespace_mismatch` | hostname suffix mismatch in injected env | no | report platform/backend issue with IDs; do not retry |
 | `build_failed` | deployment status `failed` from build phase | no | inspect build logs, fix cause, redeploy once |
 | `runtime_crash` | deployment status `crashed` or service unhealthy | no | inspect runtime logs |

@@ -2,7 +2,8 @@
 
 Default execution goes through the official npm package `@opendeploydev/cli`.
 Do not use direct gateway/curl snippets for the first-deploy path. If the CLI
-lacks a route, hand off to `opendeploy-api` with explicit user approval.
+lacks a route, use the API escape-hatch rules in the main OpenDeploy skill with
+explicit user approval.
 
 ## Verify the CLI
 

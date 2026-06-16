@@ -7,8 +7,8 @@ project -> managed dependencies -> dependency env -> services
 ```
 
 Default execution is through `@opendeploydev/cli`. Do not use raw gateway
-requests for setup. If a route is missing, hand off to `opendeploy-api` with
-explicit user approval and report the CLI gap.
+requests for setup. If a route is missing, use the API escape-hatch rules in
+the main OpenDeploy skill with explicit user approval and report the CLI gap.
 
 ## Fixed Order
 

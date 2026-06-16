@@ -9,7 +9,7 @@ OpenDeploy is the agent-first deployment platform: agents can take local source 
 Install the OpenDeploy skills with the standard Agent Skills installer:
 
 ```sh
-npx -y skills add opendeploy-dev/opendeploy-skills --skill '*'
+npx -y skills add opendeploy-dev/opendeploy-skills
 ```
 
 The installer supports the same agent targets as the Agent Skills ecosystem, including Claude Code, Codex, Cursor, OpenCode, OpenClaw, Windsurf, and more.
@@ -31,6 +31,9 @@ You can also use the short entrypoints when your agent supports slash-style skil
 /deploy
 /od
 ```
+
+OpenDeploy is published as one user-facing skill: `opendeploy`. `/deploy` and
+`/od` are aliases described inside that skill, not separate install choices.
 
 ## Install Everywhere
 
@@ -78,28 +81,15 @@ mutations. First deploy runs on OpenDeploy's free tier and creates no account,
 payment method, or charge. If a concrete quota or add-on gate appears later,
 the agent stops and asks separately.
 
-## Included Skills
+## Included Skill
 
 | Skill | Purpose |
 | --- | --- |
-| `opendeploy` | Canonical deploy, redeploy, debug, and operate entrypoint. |
-| `deploy` | Short alias for `opendeploy`. |
-| `od` | Shortest alias for `opendeploy`. |
-| `opendeploy-setup` | Install, update, verify, and repair OpenDeploy CLI and skill setup. |
-| `opendeploy-auth` | Manage OpenDeploy deploy credentials and binding state. |
-| `opendeploy-context` | Resolve, save, or inspect project/service/deployment context. |
-| `opendeploy-config` | Inspect and patch service configuration. |
-| `opendeploy-env` | Scan, upload, patch, rotate, and reconcile environment variables. |
-| `opendeploy-database` | Plan, create, wait for, and diagnose managed databases. |
-| `opendeploy-volume` | Plan and manage persistent OpenDeploy volumes. |
-| `opendeploy-domain` | Manage auto subdomains, custom domains, DNS, and SSL. |
-| `opendeploy-monorepo` | Plan monorepo and multi-service deployments. |
-| `opendeploy-debug` | Triage failed builds, runtime crashes, logs, ports, health checks, and rollout issues. |
-| `opendeploy-ops` | Monitor, restart, stop, start, rollback, and operate live services. |
-| `opendeploy-alarms` | Manage alarms and incident state. |
-| `opendeploy-oncall` | Get help from OpenDeploy staff when deployment or platform issues block progress. |
-| `opendeploy-ai-hub` | Detect, provision, and manage OpenDeploy AI API keys and model usage. |
-| `opendeploy-api` | Safe escape hatch for supported OpenDeploy API routes not yet exposed by the CLI. |
+| `opendeploy` | Canonical deploy, redeploy, debug, operate, setup, env, database, volume, domain, monorepo, AI Hub, and support entrypoint. |
+
+The package intentionally exposes only one installable skill. The internal
+OpenDeploy playbooks live under `skills/opendeploy/references/` so users do not
+need to choose or install sub-skills one by one.
 
 ## Native Plugins
 

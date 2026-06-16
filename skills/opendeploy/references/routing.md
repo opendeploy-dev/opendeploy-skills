@@ -8,7 +8,8 @@ auth, setup, and updates. `/deploy` and `/od` are short aliases for
 When the user invokes `/opendeploy ...`, stay in the main `opendeploy` skill and
 use this table as an internal handler map. Do not ask the user to re-run a
 specialist slash command such as `/opendeploy-env` or `/opendeploy-ops`.
-Specialist skills remain compatibility/debug entrypoints only.
+The universal Agent Skills package exposes only `opendeploy`; the handler names
+below are internal playbook labels.
 
 | User intent / prompt after `/opendeploy` | Internal handler |
 |---|---|
@@ -36,7 +37,7 @@ Specialist skills remain compatibility/debug entrypoints only.
 `deploy` and `od` are only convenience aliases. They must not contain their own
 deployment logic. They route to the canonical `opendeploy` autoplan workflow.
 
-## Internal handoffs
+## Internal Playbooks
 
 - Missing auth -> use `opendeploy-auth` instructions internally.
 - Saved IDs or redeploy intent -> use `opendeploy-context`.

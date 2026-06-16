@@ -1,0 +1,42 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Deploy",
+      "description": "Core OpenDeploy deployment entrypoints.",
+      "skills": [
+        "opendeploy",
+        "deploy",
+        "od",
+        "opendeploy-setup"
+      ]
+    },
+    {
+      "title": "Configure",
+      "description": "Skills for project context, configuration, environment variables, databases, volumes, domains, and monorepos.",
+      "skills": [
+        "opendeploy-auth",
+        "opendeploy-context",
+        "opendeploy-config",
+        "opendeploy-env",
+        "opendeploy-database",
+        "opendeploy-volume",
+        "opendeploy-domain",
+        "opendeploy-monorepo"
+      ]
+    },
+    {
+      "title": "Operate",
+      "description": "Skills for debugging, operations, alarms, oncall help, AI API keys, and API escape hatches.",
+      "skills": [
+        "opendeploy-debug",
+        "opendeploy-ops",
+        "opendeploy-alarms",
+        "opendeploy-oncall",
+        "opendeploy-ai-hub",
+        "opendeploy-api"
+      ]
+    }
+  ]
+}

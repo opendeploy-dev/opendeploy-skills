@@ -1,0 +1,341 @@
+{
+  "name": "opendeploy",
+  "version": "0.0.20",
+  "description": "One-click OpenDeploy autoplan for coding agents through the official versioned npm CLI. The opendeploy skill is the canonical deploy entrypoint; /deploy and /od are aliases. Common prompts include deploy this, host this, ship this, launch this, make it live, preview this, put this online, get a live URL, deploy this monorepo, deploy web plus worker, attach a persistent volume, persist data, mount persistent disk, persist uploads, persist SQLite, persist file-based queues, use OpenDeploy AI Hub for detected provider keys, and engage OpenDeploy support. First deploy is free, creates no OpenDeploy account, requires no payment method, and after explicitly-approved local deploy credential consent returns an unbound success report whose Step 1 is a bind-first project claim link; after binding, the dashboard shows the live URL and deployment details. Per-service persistent volumes are supported (single-attach RWO, node-local) — declared inline on services create for new services (no downtime) or routed via opendeploy-volume for existing services. Alarm investigation can use opendeploy-oncall to post concise updates into the user's private OpenDeploy oncall Discord thread; non-alarm platform support requests can use opendeploy-oncall to return the user's private Discord channel URL.",
+  "homepage": "https://opendeploy.dev",
+  "api_base": "https://dashboard.opendeploy.dev/api",
+  "author": {
+    "name": "OpenDeploy",
+    "email": "security@opendeploy.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opendeploy-dev/opendeploy-claude-plugin"
+  },
+  "license": "MIT",
+  "security": {
+    "contact": "security@opendeploy.dev",
+    "policy": "https://github.com/opendeploy-dev/opendeploy-claude-plugin/security/policy",
+    "reporting": "Report suspected credential exposure, unsafe skill behavior, or platform abuse to security@opendeploy.dev."
+  },
+  "cli": {
+    "package": "@opendeploydev/cli",
+    "repository": "https://github.com/opendeploy-dev/opendeploy-cli",
+    "install": [
+      "npm install -g @opendeploydev/cli@latest",
+      "npm list -g @opendeploydev/cli --depth=0 --json",
+      "opendeploy update check --json",
+      "opendeploy preflight . --json"
+    ],
+    "version_policy": "Default runner is the global opendeploy command. Before any deploy mutation, run npm list -g @opendeploydev/cli --depth=0 --json, npm view @opendeploydev/cli version --json, and opendeploy update check --json; after plugin/CLI update prompts are handled, run opendeploy preflight . --json. Treat npm list -g returning nonzero for an uninstalled package as cli_missing, not a failed or suspicious command: continue to npm view, ask once to install @opendeploydev/cli@latest, then rerun the gate. Do not replace update check/preflight with git status or hand-written version probes. If a plugin update is available, ask that first and recommend Update plugin now before the next step. Use the current host's update command: Claude runs claude plugin marketplace update opendeploy && claude plugin update opendeploy@opendeploy; Codex runs codex plugin marketplace upgrade opendeploy; OpenClaw runs openclaw plugins update opendeploydev (or openclaw plugins update clawhub:opendeploydev when updating by recorded ClawHub spec) then runs openclaw gateway restart because OpenClaw prints Restart the gateway to load plugins and hooks after updating; if OpenClaw also prints opendeploydev already at the current version, treat it as a version-status line and still restart when requested; start a new session if the running agent still does not see the new skill text. Do not use openclaw skills update for the OpenDeploy plugin package. If the user skips plugin update, continue with the loaded plugin and record the skip. Then handle CLI staleness: if npm latest is newer than global or update check reports cli_update_available, ask with structured AskUserQuestion and make Update global CLI and continue (Recommended) the first option; skip update is a fallback only and must not be recommended just because the current workflow appears compatible. If the user updates, run npm install -g @opendeploydev/cli@latest, verify npm list/view, then rerun update check and preflight. If the user skips CLI update, continue with the installed global CLI when it supports the needed commands; if it does not, stop before mutation. Do not update npm itself or unrelated global packages. Do not use npx @opendeploydev/cli as a fallback or mix npx and global inside one workflow. First-deploy mutation requires @opendeploydev/cli 0.1.19 or newer for single-target environment normalization, bound credential status, service create read-back, progress-aware deploy watching, smart source archives, deployment-auditor plan output, Git metadata bind-mount audits, dependency placeholder-secret checks, dependency credential fields, and post-deploy context save; alarm lifecycle commands require 0.1.8 or newer.",
+    "minimum_cli_version_for_deploy": "0.1.19",
+    "minimum_cli_version_for_progress": "0.1.12",
+    "minimum_cli_version_for_service_readback": "0.1.12",
+    "minimum_cli_version_for_alarm_lifecycle": "0.1.8",
+    "minimum_cli_version_for_oncall": "0.1.15"
+  },
+  "requires": {
+    "binaries": {
+      "required": [
+        "node",
+        "npm"
+      ],
+      "conditional": [
+        {
+          "name": "git",
+          "when": "deploying from GIT_URL"
+        },
+        {
+          "name": "zip",
+          "when": "uploading a local directory through the CLI"
+        },
+        {
+          "name": "unzip",
+          "when": "inspecting a user-supplied ZIP"
+        }
+      ]
+    },
+    "env_vars": {
+      "required": [],
+      "optional": [
+        "OPENDEPLOY_TOKEN",
+        "OPENDEPLOY_BASE_URL",
+        "OPENDEPLOY_AUTH_FILE",
+        "GIT_URL",
+        "GIT_BRANCH",
+        "GIT_TOKEN",
+        "SUBDOMAIN"
+      ]
+    },
+    "network": {
+      "destinations": [
+        "https://registry.npmjs.org",
+        "https://raw.githubusercontent.com/opendeploy-dev/opendeploy-claude-plugin/main/.claude-plugin/plugin.json",
+        "https://dashboard.opendeploy.dev/api"
+      ],
+      "destination_purposes": {
+        "https://registry.npmjs.org": "CLI package metadata and version probe",
+        "https://raw.githubusercontent.com/opendeploy-dev/opendeploy-claude-plugin/main/.claude-plugin/plugin.json": "CLI-owned skill-plugin version check — unauthenticated GET, never carries the OpenDeploy bearer token",
+        "https://dashboard.opendeploy.dev/api": "OpenDeploy gateway for all platform mutations and reads"
+      }
+    },
+    "persistent_files": [
+      "~/.opendeploy/auth.json",
+      "~/.opendeploy/config.json",
+      "~/.opendeploy/lib/log.sh",
+      "~/.opendeploy/logs/<UTC-date>.log",
+      ".opendeploy/attempts/*.json",
+      ".opendeploy/deploy-attempts.jsonl"
+    ],
+    "sensitive_inputs": [
+      "real .env values may be submitted to the OpenDeploy API as service env configuration after explicit key-only consent",
+      "GIT_TOKEN is sent only to the OpenDeploy gateway for private repository access",
+      "OpenDeploy tokens and local deploy credentials are stored locally with mode 0600"
+    ]
+  },
+  "files": [
+    {
+      "name": ".claude-plugin/plugin.json",
+      "url": "https://opendeploy.dev/skills/.claude-plugin/plugin.json"
+    },
+    {
+      "name": ".codex-plugin/plugin.json",
+      "url": "https://opendeploy.dev/skills/.codex-plugin/plugin.json"
+    },
+    {
+      "name": "hooks/hooks.json",
+      "url": "https://opendeploy.dev/skills/hooks/hooks.json"
+    },
+    {
+      "name": "hooks/auto-approve-cli.sh",
+      "url": "https://opendeploy.dev/skills/hooks/auto-approve-cli.sh"
+    },
+    {
+      "name": "SKILL.md",
+      "url": "https://opendeploy.dev/skills/SKILL.md"
+    },
+    {
+      "name": "skill.json",
+      "url": "https://opendeploy.dev/skills/skill.json"
+    },
+    {
+      "name": "references/cli-contract.md",
+      "url": "https://opendeploy.dev/skills/references/cli-contract.md"
+    },
+    {
+      "name": "references/routing.md",
+      "url": "https://opendeploy.dev/skills/references/routing.md"
+    },
+    {
+      "name": "references/security.md",
+      "url": "https://opendeploy.dev/skills/references/security.md"
+    },
+    {
+      "name": "references/deploy-plan.md",
+      "url": "https://opendeploy.dev/skills/references/deploy-plan.md"
+    },
+    {
+      "name": "references/deploy-attempt-record.md",
+      "url": "https://opendeploy.dev/skills/references/deploy-attempt-record.md"
+    },
+    {
+      "name": "references/ai-hub.md",
+      "url": "https://opendeploy.dev/skills/references/ai-hub.md"
+    },
+    {
+      "name": "references/troubleshooting.md",
+      "url": "https://opendeploy.dev/skills/references/troubleshooting.md"
+    },
+    {
+      "name": "references/cli.md",
+      "url": "https://opendeploy.dev/skills/references/cli.md"
+    },
+    {
+      "name": "references/api-schemas.md",
+      "url": "https://opendeploy.dev/skills/references/api-schemas.md"
+    },
+    {
+      "name": "references/analyze-local.md",
+      "url": "https://opendeploy.dev/skills/references/analyze-local.md"
+    },
+    {
+      "name": "references/dockerfile-php-laravel.md",
+      "url": "https://opendeploy.dev/skills/references/dockerfile-php-laravel.md"
+    },
+    {
+      "name": "references/failure-playbook.md",
+      "url": "https://opendeploy.dev/skills/references/failure-playbook.md"
+    },
+    {
+      "name": "references/auth.md",
+      "url": "https://opendeploy.dev/skills/references/auth.md"
+    },
+    {
+      "name": "references/setup.md",
+      "url": "https://opendeploy.dev/skills/references/setup.md"
+    },
+    {
+      "name": "references/deploy.md",
+      "url": "https://opendeploy.dev/skills/references/deploy.md"
+    },
+    {
+      "name": "references/domain.md",
+      "url": "https://opendeploy.dev/skills/references/domain.md"
+    },
+    {
+      "name": "references/operate.md",
+      "url": "https://opendeploy.dev/skills/references/operate.md"
+    },
+    {
+      "name": "deploy/SKILL.md",
+      "url": "https://opendeploy.dev/skills/deploy/SKILL.md"
+    },
+    {
+      "name": "od/SKILL.md",
+      "url": "https://opendeploy.dev/skills/od/SKILL.md"
+    },
+    {
+      "name": "opendeploy-setup/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-setup/SKILL.md"
+    },
+    {
+      "name": "opendeploy-auth/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-auth/SKILL.md"
+    },
+    {
+      "name": "opendeploy-context/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-context/SKILL.md"
+    },
+    {
+      "name": "opendeploy-env/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-env/SKILL.md"
+    },
+    {
+      "name": "opendeploy-database/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-database/SKILL.md"
+    },
+    {
+      "name": "opendeploy-monorepo/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-monorepo/SKILL.md"
+    },
+    {
+      "name": "opendeploy-config/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-config/SKILL.md"
+    },
+    {
+      "name": "opendeploy-debug/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-debug/SKILL.md"
+    },
+    {
+      "name": "opendeploy-debug/references/logs.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-debug/references/logs.md"
+    },
+    {
+      "name": "opendeploy-debug/references/port.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-debug/references/port.md"
+    },
+    {
+      "name": "opendeploy-debug/references/startup-order.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-debug/references/startup-order.md"
+    },
+    {
+      "name": "opendeploy-domain/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-domain/SKILL.md"
+    },
+    {
+      "name": "opendeploy-ops/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-ops/SKILL.md"
+    },
+    {
+      "name": "opendeploy-alarms/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-alarms/SKILL.md"
+    },
+    {
+      "name": "opendeploy-oncall/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-oncall/SKILL.md"
+    },
+    {
+      "name": "opendeploy-oncall/references/oncall-cli.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-oncall/references/oncall-cli.md"
+    },
+    {
+      "name": "opendeploy-api/SKILL.md",
+      "url": "https://opendeploy.dev/skills/opendeploy-api/SKILL.md"
+    },
+    {
+      "name": "scripts/log.sh",
+      "url": "https://opendeploy.dev/skills/scripts/log.sh"
+    }
+  ],
+  "auth": {
+    "scheme": "Bearer",
+    "header": "Authorization: Bearer <token>",
+    "token_kinds": [
+      {
+        "prefix": "od_k",
+        "kind": "dashboard_token",
+        "authority": "account-level deploy authority"
+      },
+      {
+        "prefix": "od_a",
+        "kind": "local_deploy_credential",
+        "authority": "guest tenant while unbound; account-level deploy authority after binding"
+      }
+    ],
+    "auth_file": {
+      "path": "~/.opendeploy/auth.json",
+      "permissions": "0600",
+      "schema": {
+        "version": "int",
+        "api_key": "string",
+        "gateway": "string",
+        "guest_id": "string, optional",
+        "bind_sig": "string, optional",
+        "env_consent": "object, optional"
+      },
+      "binding_url_persistence": "Not stored. Derive at use-time from gateway + guest_id + bind_sig and print only after an active deploy URL exists."
+    }
+  },
+  "guest_tier": {
+    "applies_when": "token kind=local_deploy_credential AND state=pending",
+    "enforcement": "Backend rejects project/service mutations with 403 guest_quota_exceeded when the pending guest exceeds the 10-project cap or CPU, memory, or replicas exceed the free-plan ceiling.",
+    "cpu_limit_source": "billing-service free plan CPU millicores",
+    "memory_limit_source": "billing-service free plan memory bytes",
+    "replicas": 1,
+    "upgrade_url": "https://dashboard.opendeploy.dev/settings",
+    "upgrade_recommendation": "When a quota/plan gate blocks the intended deploy, ask with Upgrade plan (Recommended) first. If chosen, return upgrade_url exactly and stop mutation until the user comes back.",
+    "quota_resource_guidance": "If the backend returns exceeded_resources, treat it as authoritative because active add-ons are already included. Report the exact resource, current/requested/limit, and matching available_addons before recommending upgrade.",
+    "guest_projects_hard_cap": 10,
+    "services_per_project_hard_cap": null,
+    "services_per_project_recommended_max": 3,
+    "managed_database": true,
+    "supported_managed_dependencies": [
+      "postgres",
+      "mysql",
+      "mongodb",
+      "redis"
+    ],
+    "subdomain_rename": true,
+    "custom_domain": false,
+    "billing_routes": false,
+    "idle_gc_hours": 6
+  },
+  "account_binding_url": {
+    "format": "{gateway_host_without_api}/guest/{guest_id}?h={bind_sig}&url={app_url}",
+    "purpose": "User-facing bind-first handoff after a successful unbound guest deployment. The skill never binds on the user's behalf and does not separately print the live URL in the unbound success banner.",
+    "skill_must": "Print the URL only after the deployment is active and APP_URL is known. Never print bind_sig standalone."
+  },
+  "metadata": {
+    "category": "deploy",
+    "tagline": "One-click deploy autoplan through the versioned OpenDeploy CLI.",
+    "execution_source": "@opendeploydev/cli",
+    "canonical_entrypoint": "opendeploy",
+    "aliases": [
+      "deploy",
+      "od"
+    ],
+    "single_user_facing_environment": true,
+    "universal_user_entrypoint": true,
+    "specialist_skills_visibility": "internal_compatibility_only"
+  }
+}

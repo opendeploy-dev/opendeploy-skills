@@ -324,9 +324,10 @@ decision before mutation. Available options on the OpenDeploy path:
   file queues, on-disk repo storage, indexes, or other durable data to a fixed
   filesystem path. This stays the recommended option for demos/templates too
   when users can create new uploads/media or other local files; do not label
-  ephemeral storage "Recommended for demo" in that case. Never auto-attach:
-  surface this option and let the user pick it. Routing depends on whether the
-  service exists yet:
+  ephemeral storage "Recommended for demo" in that case. Surface the storage
+  choice in the deploy plan and include it in the single deploy consent; do
+  not ask a second volume question for a brand-new service once the user has
+  approved the plan. Routing depends on whether the service exists yet:
   - **New service (during first deploy):** include the `volumes` array
     inline in `service.json` on the `services create` step (see
     `references/api-schemas.md` Step 3.3 `volumes` sub-schema). The service
@@ -393,7 +394,7 @@ report bind-first handoff for unbound guest projects, or live URL plus dashboard
 ```
 
 If startup-critical env remains unresolved before service creation, resolve it
-in this order: real local env file with upload consent, managed dependency env,
+in this order: real local env file covered by deploy/env consent, managed dependency env,
 generated app secret, manual user value, or user-approved boot-safe placeholder
 for integrations that are not needed for the first smoke test. Do not create a
 deployment just to discover missing env one crash at a time.

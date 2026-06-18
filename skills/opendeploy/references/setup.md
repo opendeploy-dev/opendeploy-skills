@@ -197,7 +197,7 @@ instead of trying to win the patch race.
 Merge order:
 
 1. local plan defaults
-2. user real non-empty values approved by env-upload consent
+2. user real non-empty values approved by deploy/env consent
 3. managed DB/cache generated values
 4. explicit user-approved conflict override
 
@@ -293,26 +293,28 @@ Dockerfile mode rule: use Dockerfile mode when the project already has a
 source-root `Dockerfile`. If no Dockerfile exists, use autodetect plus explicit
 build/start/port config when that produces a runnable service. If autodetect
 cannot identify a service but local evidence clearly identifies the runtime,
-entrypoint, and HTTP port, Dockerfile authoring is allowed after structured
-source-edit approval; follow `dockerfile-authoring.md` and create a source-root
-`Dockerfile`, not `Dockerfile.opendeploy`. If the repo has `docker/Dockerfile`
-or another nested Dockerfile, ask before changing the source root or
-copying/renaming it.
+entrypoint, and HTTP port, Dockerfile authoring is allowed when listed in the
+approved deploy plan; otherwise ask for structured source-edit approval. Follow
+`dockerfile-authoring.md` and create a source-root `Dockerfile`, not
+`Dockerfile.opendeploy`. If the repo has `docker/Dockerfile` or another nested
+Dockerfile, include the source-root/path choice in the deploy plan before
+approval, otherwise ask before changing the source root or copying/renaming it.
 
 If the app declares persistent storage (`VOLUME`, compose volumes, uploads,
-media, repo/data directories), ask before creating resources. The OpenDeploy
-path is a production deploy plan with an explicit storage decision: configure
-the app's object-storage/media env first, attach a per-service persistent
-volume, or continue with ephemeral local files after explicit data-loss
-acknowledgement. Recommend the volume path for uploads/media/user-created files
-even for demos/templates; ephemeral is only a throwaway choice after explicit
-data-loss acceptance. Never auto-attach a volume. For a new service in this deploy,
-include `volumes` inline in `service.json` on `services create` (StatefulSet
-from the start, no downtime). For an existing service, route to
-`opendeploy-volume` (first volume triggers a destructive
-Deployment→StatefulSet conversion with ~30s downtime). Do not promise
-persistence through Postgres when the app also stores important files on disk,
-and do not suggest another platform unless the user asks.
+media, repo/data directories), resolve storage before creating resources and
+include that decision in the single deploy consent. The OpenDeploy path is a
+production deploy plan with an explicit storage decision: configure the app's
+object-storage/media env first, attach a per-service persistent volume, or
+continue with ephemeral local files after explicit data-loss acknowledgement.
+Recommend the volume path for uploads/media/user-created files even for
+demos/templates; ephemeral is only a throwaway choice after explicit data-loss
+acceptance. Do not silently attach a volume that was not shown to the user. For
+a new service in this deploy, include `volumes` inline in `service.json` on
+`services create` (StatefulSet from the start, no downtime). For an existing
+service, route to `opendeploy-volume` (first volume triggers Deployment→StatefulSet
+conversion with ~30s downtime and may need separate live-service approval). Do
+not promise persistence through Postgres when the app also stores important
+files on disk, and do not suggest another platform unless the user asks.
 
 When the selected storage path is external object storage, get the secret source
 before any cloud mutation. Use structured secret input when available, or ask

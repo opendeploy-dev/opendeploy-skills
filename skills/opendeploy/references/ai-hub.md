@@ -71,8 +71,9 @@ Reduce false positives:
 
 ## User question
 
-When AI Hub usage is required or likely startup-critical, ask before cloud
-mutation:
+When AI Hub usage is required or likely startup-critical, decide before cloud
+mutation. If possible, include this choice in the single deploy consent; if the
+runtime cannot express it clearly there, ask one short AI Hub question first:
 
 ```text
 question: "This project uses AI provider env keys: <KEYS>. How should OpenDeploy configure them?"
@@ -130,7 +131,7 @@ Response shape:
 ```
 
 - `key` — the real AI Hub bearer token. Treat as a secret. It flows from CLI
-  stdout straight into local-file writes; never echo it into chat, never
+  stdout into service-env preparation only; never echo it into chat, never
   paste it into a service body, never store it in the deploy-attempt record.
 - `key_propagated` — `true` when OpenDeploy already wrote the resolved value
   into existing project secrets (re-provision case); `false` on first
@@ -145,9 +146,14 @@ If provision fails (HTTP 4xx/5xx, network error, `quota_exceeded`):
 - Surface the exact error and offer the user `Retry`, `Switch to Use my own
   AI keys`, or `Cancel deploy`.
 
-**2. Local-file fill — structured approval first.**
+**2. Local-file fill — skip by default.**
 
-Before writing anything to the user's working tree, raise one
+Do not ask a separate local `.env` write question during first deploy. The
+deploy consent covers OpenDeploy service env upload, not writing real provider
+tokens into the user's worktree. Leave local files untouched unless the user
+explicitly asks for local dev to use AI Hub too.
+
+If the user explicitly asks to sync AI Hub into local dev files, raise one
 `AskUserQuestion`:
 
 ```text
@@ -167,7 +173,7 @@ options:
     "Only update the OpenDeploy backend service env at Step 10."
 ```
 
-**3. File-write rules (strict).**
+**3. File-write rules for optional local sync (strict).**
 
 - **Never** write the real AI Hub token into any committed file. Files
   matching `*.example`, `*.sample`, `*.template`, `README*`, or anything
@@ -250,13 +256,13 @@ entirely`). Never store the resolved token value.
   backend resolves the placeholder to the new value across every service
   variable that references it. If the agent had written the raw key value
   into `runtime_variables` at creation time, rotation would not propagate.
-- **Local-file write (step 2) is the user-visible part.** Real key in
-  `.env` means `pnpm dev` / `python manage.py runserver` / etc. start
-  using AI Hub immediately, not just the deployed copy.
+- **Local-file write is optional.** The default first-deploy path only wires
+  OpenDeploy service env. Real key writes into `.env` happen only when the user
+  explicitly asks local dev to use AI Hub too.
 
 For `Use my own AI keys`:
 
-- Use the normal `opendeploy-env` key-only consent flow.
+- Use the normal key-only deploy/env consent flow.
 - Accept values via structured secret input or a local `0600` file/body.
 - Never print provider key values.
 

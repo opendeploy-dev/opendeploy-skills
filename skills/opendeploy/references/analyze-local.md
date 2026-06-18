@@ -242,8 +242,10 @@ internal by default.
   in an included path such as `Dockerfile.web` / `Dockerfile.worker`; do not
   put them under `.opendeploy/`.
 - Worker-only services need an explicit readiness plan. If no HTTP listener is
-  present and the platform requires one, ask before adding a minimal health
-  shim. Do not expose a worker as the public service just to satisfy a port.
+  present and the platform requires one, include a minimal health shim in the
+  deploy plan and apply it under the single deploy approval. Ask separately
+  only when the shim appears after approval or changes an existing live worker.
+  Do not expose a worker as the public service just to satisfy a port.
 - Before upload, compare `archive_manifest.files` / `included_overrides` with
   each service's `dockerfile_path`, build context, and `COPY` sources. A
   service-specific Dockerfile that is absent from the archive is a blocker.
@@ -477,10 +479,11 @@ builds deterministic before mutation:
 - Inspect Dockerfile package-manager commands. If the Dockerfile uses unpinned
   Corepack or latest-style commands such as `corepack use pnpm`,
   `corepack prepare pnpm@latest`, or a bare package-manager install while
-  `package.json.packageManager` pins a version, ask before patching the
-  Dockerfile to the pinned version. Prefer pinning the package manager to the
-  repo declaration over upgrading the base image unless repo evidence requires
-  a newer runtime.
+  `package.json.packageManager` pins a version, include the pinning patch in
+  the deploy plan and apply it under the single deploy approval. Ask separately
+  only when this patch appears after approval. Prefer pinning the package
+  manager to the repo declaration over upgrading the base image unless repo
+  evidence requires a newer runtime.
 - Treat package-manager mismatch as a pre-build issue, not a cloud retry
   issue. Do not wait for OpenDeploy to spend build minutes discovering that
   Node, Corepack, and the package-manager version are incompatible.
@@ -636,9 +639,12 @@ OpenDeploy `services env patch --body ... --confirm-env-upload` commands after
 services exist; do not ask the user to paste or execute CLI command blocks as
 the normal path.
 
-Never auto-attach a volume — `opendeploy-volume` carries its own
-workload-conversion confirmation. Do not call the deployment a preview, and
-do not suggest a competing platform unless the user asks for alternatives.
+Do not silently attach a volume that was not shown to the user. For new
+services, the volume choice can be covered by the single deploy consent and
+created inline on `services create`. For existing services, `opendeploy-volume`
+carries the workload-conversion confirmation. Do not call the deployment a
+preview, and do not suggest a competing platform unless the user asks for
+alternatives.
 
 Also scan for installer/bootstrap bypass flags such as `INSTALL_LOCK`,
 `SETUP_DONE`, `SKIP_INSTALL`, `DISABLE_INSTALLER`, and app-specific
@@ -742,8 +748,11 @@ for the full TTL.
 
 ### Recommended fix
 
-When this risk is present, ask before patching the Nginx config. The
-recommended option should be `Patch Nginx cache policy (Recommended)`.
+When this risk is present before deployment, include the Nginx cache-policy
+patch in the deploy plan and apply it under the single deploy approval. If the
+risk is discovered only after a stale-content failure, present one concise
+`Patch Nginx cache policy (Recommended)` repair approval, then patch, upload,
+redeploy once, and verify headers.
 
 Use this safe shape for mutable static builds:
 

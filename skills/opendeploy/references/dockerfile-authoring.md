@@ -128,9 +128,11 @@ FROM vendor/app:tag
 ```
 
 For a worker that does not listen on HTTP but needs a readiness endpoint on the
-current platform, ask before adding a tiny health shim. The shim must start the
-real worker as the main child process and exit when the worker exits; it is not
-a substitute for fixing a crashing worker.
+current platform, include a tiny health shim in the approved deploy plan when
+detected before mutation; ask separately only if the shim is introduced after
+approval or changes an existing live worker. The shim must start the real worker
+as the main child process and exit when the worker exits; it is not a substitute
+for fixing a crashing worker.
 
 ## Ruby / Rails
 

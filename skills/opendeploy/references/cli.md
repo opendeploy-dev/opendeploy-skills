@@ -7,14 +7,10 @@ explicit user approval.
 
 ## Verify the CLI
 
-Default runner is the global `opendeploy` command. Run global version checks
-before preflight:
+Default runner is the global `opendeploy` command. Normal deploy flow starts
+with one fast gateway-backed preflight:
 
 ```bash
-npm list -g @opendeploydev/cli --depth=0 --json
-npm view @opendeploydev/cli version --json
-opendeploy update check --json
-# after update prompts are handled:
 opendeploy preflight . --json
 ```
 
@@ -25,23 +21,32 @@ Expected package:
 - license: `MIT`
 - security contact: `security@opendeploy.dev`
 
-The npm commands are mandatory before deploy so stale global installs are
-detected even when the installed CLI is too old to self-report updates.
-`update check` includes plugin version and CLI update status. `preflight`
-includes auth state, saved context, gateway health, and a read-only plan
-summary. If package or plugin metadata cannot be verified, do read-only
-inspection only. Ask the user before any mutating deploy step.
+`preflight` includes local CLI version, local skill/plugin version, auth state,
+saved context, gateway health, the `/v1/status` update policy, and a read-only
+plan summary. The dashboard status policy is the authoritative deploy-time
+version gate. Do **not** run `npm view`, `npm list`, GitHub raw manifest fetches,
+or `opendeploy update check` during normal deploy flow.
+
+Use `opendeploy update check --json` only for explicit setup/update/latest
+audits, or when preflight reports `updates.policy_update_required: true` and
+the returned `policy_commands` call for a refresh/update. That command may use
+npm/GitHub metadata for optional latest-version auditing, but it is not the
+normal deploy-time status API. Before mutation, use the single deploy approval
+from `SKILL.md`; do not split credential creation, env upload, source upload,
+managed dependencies, new-service volumes, and first deployment into separate
+questions when they were all shown in the plan.
 
 ## Agent plugin updates
 
-When `opendeploy update check --json` or `opendeploy preflight . --json`
-reports a stale OpenDeploy skill/plugin, inspect `plugin.installed_plugins[]`
-and `plugin.update_available_platforms[]` before acting. A machine can have
-Claude, Codex, Cursor, OpenClaw, and OpenCode installed at different versions; a
-current plugin on one host does not prove the other host plugins/skills are
-current. Ask the plugin update question before deploy mutation when the current
-host is stale or the current host cannot be determined. Use the command for the
-stale host:
+When `opendeploy preflight . --json` reports `updates.policy_update_required`
+for `policy_target: "skill"`/`"plugin"`, inspect `plugin.installed_plugins[]`
+and `plugin.update_available_platforms[]` if present before acting. A machine
+can have Claude, Codex, Cursor, OpenClaw, OpenCode, and universal `.agents`
+skills installed at different versions; a current plugin on one host does not
+prove the other host plugins/skills are current. Ask the plugin update question
+before deploy mutation only when the gateway status policy says the current
+host is stale/blocked or the current host cannot be determined. Use the command
+for the stale host:
 
 ```bash
 # Claude Code
@@ -82,21 +87,16 @@ running it again updates `~/.agents/skills/*`, `~/.config/opencode/commands/*`,
 and the local OpenDeploy skill version marker. If the running OpenCode session
 still sees old skill text after the update, start a new session.
 
-Before preflight-driven deploy planning or any deploy mutation, check the
-global CLI with `npm list -g @opendeploydev/cli --depth=0 --json` and
-`npm view @opendeploydev/cli version --json`. If `npm list -g` exits nonzero
-because the package is not installed, treat that as a normal first-run
-`cli_missing` state: ask once to install the official global CLI and continue.
-If npm latest is newer than the installed global CLI, offer to update. If the
-user declines, continue with the installed global CLI when it supports the
-needed commands:
+Before preflight-driven deploy planning or any deploy mutation, check whether
+the global CLI exists by trying `opendeploy preflight . --json`. If the command
+is missing, treat it as a normal first-run `cli_missing` state: ask once to
+install the official global CLI and continue. Do not query npm latest unless
+the user explicitly asks for setup/update/latest status or the gateway policy
+requires an update:
 
 ```bash
-# Optional update — only @opendeploydev/cli, never npm itself:
+# Setup/update path only — only @opendeploydev/cli, never npm itself:
 npm install -g @opendeploydev/cli@latest
-npm list -g @opendeploydev/cli --depth=0 --json
-npm view @opendeploydev/cli version --json
-opendeploy update check --json
 opendeploy preflight . --json
 ```
 
@@ -159,27 +159,18 @@ region preference unless the CLI/gateway returns a concrete gate.
 Start with the global CLI preflight:
 
 ```bash
-npm list -g @opendeploydev/cli --depth=0 --json
-npm view @opendeploydev/cli version --json
-opendeploy update check --json
 opendeploy preflight . --json
 ```
 
-If `update check` reports `updates.plugin_update_available`, use
-`opendeploy-setup`, name the stale platform(s) from
-`plugin.update_available_platforms[]`, and recommend `Update plugin now` before
-the next step when the current host is stale or unknown. If only other installed
-agent surfaces are stale, mention their update commands as housekeeping and
-continue the current deploy. If the user skips the plugin update, continue with
-the loaded plugin and record the skip. Then, if npm latest is newer than global or `update check` reports
-`cli.update_required_for_deploy` / `updates.cli_update_available`, use the same
-setup flow for the CLI question before project-specific analysis and make
-`Update global CLI and continue (Recommended)` the first option. Do not
-recommend skipping merely because the current command family appears compatible.
-If the user updates the CLI, rerun `update check` and preflight. If the user
-skips the CLI update, continue with the installed global CLI if it supports this
-workflow. If preflight reports plan issues, fix the plan before creating cloud
-resources.
+If preflight reports `updates.policy_update_required`, use `opendeploy-setup`
+and follow `updates.policy_target`, `updates.policy_commands`, and
+`updates.policy.reason`. For `policy_blocked: true`, stop before mutation until
+the required CLI/skill update is complete. For non-blocking policy, recommend
+the update but allow a one-run skip when the command set still supports the
+workflow. If preflight reports no policy requirement, do not run the old
+`update check` latest-version path and do not mention plugin update status as a
+deployment blocker. If preflight reports plan issues, fix the plan before
+creating cloud resources.
 
 Progress-aware build watching and service create read-back require CLI `0.1.12+`.
 Smart source archives, deployment-auditor plan output, dependency credential
@@ -593,8 +584,10 @@ opendeploy services env unset "$PROJECT_ID" "$SERVICE_ID" "$KEY" --confirm-env-u
 
 Use `services env reconcile --from-plan ...` only when syncing a reviewed plan.
 Never use full env replacement merely to delete one key.
-After any env mutation, read back key names and ask before redeploy. App-visible
-env requires a new deployment:
+After any env mutation, read back key names. App-visible env requires a new
+deployment. If the env mutation and redeploy were already part of the approved
+deploy/redeploy plan, create the deployment directly; otherwise ask before
+redeploying:
 
 ```bash
 opendeploy deployments create --project "$PROJECT_ID" --service "$SERVICE_ID" --json

@@ -240,29 +240,33 @@ Required invariants:
   points to a file inside the uploaded source tree, and `builder` reads as
   `dockerfile`.
 - Prefer source-root `Dockerfile` when one exists. If multiple Dockerfiles
-  exist, ask before selecting a non-root variant such as `Dockerfile.rootless`
-  or a nested path such as `docker/Dockerfile`. If there is no Dockerfile and
+  exist, include non-root variants such as `Dockerfile.rootless` or nested
+  paths such as `docker/Dockerfile` in the approved deploy plan before using
+  them; ask separately only when the choice appears after consent. If there is no Dockerfile and
   OpenDeploy autodetect/config can deploy the service, use that path. If
   preflight/plan reports `no_service_detected`, `no_package_or_dockerfile`, or
   a clear unsupported runtime shape, Dockerfile authoring is an allowed
-  OpenDeploy continuation. If file-edit permission is already granted, write the
-  minimal deployment files and continue; otherwise ask for structured
-  source-edit approval. Follow `references/dockerfile-authoring.md`; for
+  OpenDeploy continuation. If file-edit permission is already granted or the
+  files were listed in the approved deploy plan, write the minimal deployment
+  files and continue; otherwise ask for structured source-edit approval. Follow
+  `references/dockerfile-authoring.md`; for
   PHP/Laravel specifics, also use `references/dockerfile-php-laravel.md`. Show
   the generated files for review before upload.
 - If Dockerfile or compose exposes multiple ports, the service port is the HTTP
   listener. Unsupported secondary protocols such as SSH, SMTP, or raw TCP must
   be called out before deploy and disabled/left unsupported only with user
   approval.
-- If the app needs persistent filesystem state, pause before mutation and ask
-  for the OpenDeploy storage strategy. Options: attach an OpenDeploy volume
+- If the app needs persistent filesystem state, resolve the OpenDeploy storage
+  strategy before mutation and include it in the single deploy consent when
+  known. Options: attach an OpenDeploy volume
   (recommended for local uploads, backups, media, SQLite, file queues, repo
   storage, or other fixed filesystem paths), configure the app's
   object-storage/media env when it is already designed for external object
   storage, continue with ephemeral local files after explicit data-loss
-  acknowledgement, or review details. Never auto-attach a volume. For a new
-  service in this deploy, include `volumes` inline in `service.json` on
-  `services create` (StatefulSet from the start, no downtime). For an existing
+  acknowledgement, or review details. Do not silently attach a volume that was
+  not shown to the user. For a new service in this deploy, include `volumes`
+  inline in `service.json` on `services create` (StatefulSet from the start, no
+  downtime). For an existing
   service, route to `opendeploy-volume` for the workload-conversion
   confirmation. Do not call the deploy a preview and do not suggest another
   platform unless the user asks.

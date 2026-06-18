@@ -74,11 +74,13 @@ does not create an OpenDeploy project, upload source code, create credentials,
 write environment variables, or start billing.
 
 The skills use the official global `opendeploy` CLI for OpenDeploy actions.
-They are written to ask before credential creation, real environment-variable
-upload, paid AI Hub credit changes, destructive actions, or live-service
-mutations. First deploy runs on OpenDeploy's free tier and creates no account,
-payment method, or charge. If a concrete quota or add-on gate appears later,
-the agent stops and asks separately.
+They are written to use one concise approval for planned first-deploy work:
+local deploy credential creation, source upload, generated app secrets, service
+environment variables, managed resources, deployment-file edits, and deployment
+creation. First deploy runs on OpenDeploy's free tier and creates no account,
+payment method, or charge. The agent asks again only for work outside the
+approved plan, such as paid add-ons, destructive deletes, custom domains/DNS,
+or writing real secrets into git-tracked files.
 
 ## Included Skill
 

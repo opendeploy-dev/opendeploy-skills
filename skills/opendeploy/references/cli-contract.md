@@ -20,21 +20,22 @@ security contact: security@opendeploy.dev
 Verify when trust matters:
 
 ```bash
-npm list -g @opendeploydev/cli --depth=0 --json
-npm view @opendeploydev/cli version --json
 opendeploy preflight . --json
 ```
 
-The npm commands are the global CLI version gate. They catch stale global
-installs before the agent trusts `opendeploy preflight`. Run them sequentially
-enough that `npm list -g` returning nonzero for an uninstalled package is
-handled as `cli_missing`, not a failed or suspicious install. Continue to
-`npm view`, ask one setup approval for `npm install -g
-@opendeploydev/cli@latest`, then verify and run `preflight`. `preflight` then
-returns OpenDeploy skill-plugin version status, auth state, saved context,
-gateway health, and a read-only deploy plan summary in one JSON object. Do not
-run separate `--version`, `auth status`, `context resolve`, `jq`, or raw `curl`
-plugin probes as the default preamble.
+`preflight` is the normal deploy-time version gate. It returns local CLI and
+skill/plugin versions, auth state, saved context, gateway health, `/v1/status`
+update policy, and a read-only deploy plan summary in one JSON object. Do not
+run separate `npm view`, `npm list`, `opendeploy update check`, `--version`,
+`auth status`, `context resolve`, `jq`, GitHub raw manifest fetches, or raw
+`curl` plugin probes as the default preamble.
+
+If `opendeploy` is missing, handle that as `cli_missing`: ask one setup approval
+for `npm install -g @opendeploydev/cli@latest`, then run `preflight`. If
+`preflight` returns `updates.policy_update_required`, follow the gateway
+policy (`policy_target`, `policy_commands`, `policy_blocked`, `reason`) before
+mutation. Npm/GitHub latest checks belong to explicit setup/update/latest
+audits, not normal deploy.
 
 Default to the global `opendeploy` command. If global is missing or stale, ask
 once whether to install/update `@opendeploydev/cli@latest`; if the user skips
